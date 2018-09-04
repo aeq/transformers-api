@@ -46,7 +46,7 @@ router.get('/transformers/:transformerId', (request, response) => {
         });
 });
 router.post('/transformers', (request, response) => {
-    validateTransformer(request, response, () => {
+    validateAndCreateTransformer(request, response, transformer => {
         var transformersRef = request.database.ref("transformers").child(request.transformersId);
         var transformerRef = transformersRef.push();
         transformer.id = transformerRef.key;
@@ -63,8 +63,9 @@ router.post('/transformers', (request, response) => {
     });
 });
 router.put('/transformers', (request, response) => {
-    validateTransformer(request, response, transformer => {
-        if (transformer.id) {
+    validateAndCreateTransformer(request, response, transformer => {
+        if (request.body.id) {
+            transformer.id = request.body.id;
             var transformerRef = request.database.ref("transformers")
                 .child(request.transformersId)
                 .child(transformer.id);
@@ -106,53 +107,69 @@ router.delete('/transformers/:transformerId', (request, response) => {
         });
 });
 
-function validateTransformer(request, response, next) {
-    if (request.body === null) {
+function validateAndCreateTransformer(request, response, next) {
+    if (!request.body) {
         response.status(400);
         response.send('Empty request body.');
         return;
     }
-    let transformer = request.body;
-    if (transformer.name === null || transformer.name === '') {
+    if (!request.body.name || request.body.name === "") {
         response.status(400);
         response.send('Invalid Transformer name.');
         return;
-    } else if (transformer.team === null || (transformer.team !== "A" && transformer.team !== "D")) {
+    } else if (!request.body.team || (request.body.team !== "A" && request.body.team !== "D")) {
         response.status(400);
         response.send('Invalid Transformer team (Should be either \'A\' or \'D)\'.');
         return;
-    } else if (transformer.strength === null || transformer.strength < 1 || transformer.strength > 10) {
+    } else if (!request.body.strength || request.body.strength < 1 || request.body.strength > 10) {
         response.status(400);
         response.send('Invalid strength score (Should be between 1 and 10).');
         return;
-    } else if (transformer.intelligence === null || transformer.intelligence < 1 || transformer.intelligence > 10) {
+    } else if (!request.body.intelligence || request.body.intelligence < 1 || request.body.intelligence > 10) {
         response.status(400);
         response.send('Invalid intelligence score (Should be between 1 and 10).');
         return;
-    } else if (transformer.speed === null || transformer.speed < 1 || transformer.speed > 10) {
+    } else if (!request.body.speed || request.body.speed < 1 || request.body.speed > 10) {
         response.status(400);
         response.send('Invalid speed score (Should be between 1 and 10).');
         return;
-    } else if (transformer.endurance === null || transformer.endurance < 1 || transformer.endurance > 10) {
+    } else if (!request.body.endurance || request.body.endurance < 1 || request.body.endurance > 10) {
         response.status(400);
         response.send('Invalid endurance score (Should be between 1 and 10).');
         return;
-    } else if (transformer.rank === null || transformer.rank < 1 || transformer.rank > 10) {
+    } else if (!request.body.rank || request.body.rank < 1 || request.body.rank > 10) {
         response.status(400);
         response.send('Invalid rank score (Should be between 1 and 10).');
         return;
-    } else if (transformer.courage === null || transformer.courage < 1 || transformer.courage > 10) {
+    } else if (!request.body.courage || request.body.courage < 1 || request.body.courage > 10) {
         response.status(400);
         response.send('Invalid courage score (Should be between 1 and 10).');
         return;
-    } else if (transformer.firepower === null || transformer.firepower < 1 || transformer.firepower > 10) {
+    } else if (!request.body.firepower || request.body.firepower < 1 || request.body.firepower > 10) {
         response.status(400);
         response.send('Invalid firepower score (Should be between 1 and 10).');
         return;
-    } else if (transformer.skill === null || transformer.skill < 1 || transformer.skill > 10) {
+    } else if (!request.body.skill || request.body.skill < 1 || request.body.skill > 10) {
         response.status(400);
         response.send('Invalid skill score (Should be between 1 and 10).');
         return;
+    }
+    var transformer = {
+        name: request.body.name,
+        team: request.body.team,
+        strength: request.body.strength,
+        intelligence: request.body.intelligence,
+        speed: request.body.speed,
+        endurance: request.body.endurance,
+        rank: request.body.rank,
+        courage: request.body.courage,
+        firepower: request.body.firepower,
+        skill: request.body.skill
+    };
+    if (transformer.team === "A") {
+        transformer.team_icon = "https://tfwiki.net/mediawiki/images2/archive/f/fe/20110410191732%21Symbol_autobot_reg.png";
+    } else if (transformer.team === "D") {
+        transformer.team_icon = "https://tfwiki.net/mediawiki/images2/archive/8/8d/20110410191659%21Symbol_decept_reg.png";
     }
     next(transformer);
 }

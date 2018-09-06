@@ -1,9 +1,55 @@
 const express = require('express');
 const router = express.Router();
 
+/**
+ * @typedef Transformer
+ * @property {integer} id - Uniquely generated ID.
+ * @property {string} name - Transformer name.
+ * @property {string} team - Transformer team, either "A" or "D" (Autobot or Decepticon).
+ * @property {integer} strength - Strength value, must be between 1 and 10.
+ * @property {integer} intelligence - Intelligence value, must be between 1 and 10.
+ * @property {integer} speed - Speed value, must be between 1 and 10.
+ * @property {integer} endurance - Endurance value, must be between 1 and 10.
+ * @property {integer} rank - Rank value, must be between 1 and 10.
+ * @property {integer} courage - Courage value, must be between 1 and 10.
+ * @property {integer} firepower - Firepower value, must be between 1 and 10.
+ * @property {integer} skill - Skill value, must be between 1 and 10.
+ * @property {string} team_icon - An image URL that represents what team the Transformer is on.
+ */
+
+/**
+ * @typedef Transformers
+ * @property {Array.<Transformer>} transformers - A list of Transformers.
+ */
+
+/**
+ * @typedef TransformerRequest
+ * @property {integer} id - Only needed for PUT requests and must be valid. Will be ignored for POST requests.
+ * @property {string} name.required - Transformer name.
+ * @property {string} team.required - Transformer team, either "A" or "D" (Autobot or Decepticon).
+ * @property {integer} strength.required - Strength value, must be between 1 and 10.
+ * @property {integer} intelligence.required - Intelligence value, must be between 1 and 10.
+ * @property {integer} speed.required - Speed value, must be between 1 and 10.
+ * @property {integer} endurance.required - Endurance value, must be between 1 and 10.
+ * @property {integer} rank.required - Rank value, must be between 1 and 10.
+ * @property {integer} courage.required - Courage value, must be between 1 and 10.
+ * @property {integer} firepower.required - Firepower value, must be between 1 and 10.
+ * @property {integer} skill.required - Skill value, must be between 1 and 10.
+ */
+
+/**
+ * Gets a list of the Transformers created using the POST API. Returns a maximum list of 50 Transformers starting from the oldest created Transformer.
+ * @route GET /transformers
+ * @group transformers - Operations on Transformers
+ * @produces application/json
+ * @returns {Transformers.model} 200 - An object containing a list of Transformers.
+ * @returns {Error}  default - Unexpected error
+ * @headers {string} 200.Authorization - Authorization header with the value "Bearer <token>", where <token> is the retrieved token from the /allspark API. 
+ * @security JWT
+ */
 router.get('/transformers', (request, response) => {
     var transformersRef = request.database.ref("transformers").child(request.transformersId);
-    transformersRef.limitToLast(10).once("value")
+    transformersRef.limitToLast(50).once("value")
         .then(snapshot => {
             if (snapshot === null) {
                 response.json({});
@@ -24,6 +70,17 @@ router.get('/transformers', (request, response) => {
             response.send(err.message);
         });
 });
+/**
+ * Gets a Transformer based on a valid ID.
+ * @route GET /transformers/{transformerId}
+ * @group transformers - Operations on Transformers
+ * @produces application/json
+ * @param {string} transformerId.path.required - ID of the Transformer to retrieve.
+ * @returns {Transformers.model} 200 - An object containing a list of Transformers.
+ * @returns {Error}  401 - Transformer not found.
+ * @headers {string} 200.Authorization - Authorization header with the value "Bearer <token>", where <token> is the retrieved token from the /allspark API. 
+ * @security JWT
+ */
 router.get('/transformers/:transformerId', (request, response) => {
     return request.database.ref("transformers")
         .child(request.transformersId)
@@ -45,6 +102,18 @@ router.get('/transformers/:transformerId', (request, response) => {
             response.send(err.message);
         });
 });
+/**
+ * Creates a Transformer with the provided data in the request body (in JSON). Note that the “overall rating” is not returned.
+ * @route POST /transformers
+ * @group transformers - Operations on Transformers
+ * @consumes application/json
+ * @produces application/json
+ * @param {TransformerRequest.model} transformer.body.required - The request body representing the Transformer to be created.
+ * @returns {Transformer.model} 201 - The created Transformer object.
+ * @returns {Error}  default - Unexpected error
+ * @headers {string} 200.Authorization - Authorization header with the value "Bearer <token>", where <token> is the retrieved token from the /allspark API. 
+ * @security JWT
+ */
 router.post('/transformers', (request, response) => {
     validateAndCreateTransformer(request, response, transformer => {
         var transformersRef = request.database.ref("transformers").child(request.transformersId);
@@ -62,6 +131,16 @@ router.post('/transformers', (request, response) => {
             });
     });
 });
+/**
+ * Updates an existing Transformer with the provided data in the request body, the Transformer ID must be valid.
+ * @route PUT /transformers
+ * @group transformers - Operations on Transformers
+ * @param {TransformerRequest.model} transformer.body.required - The request body representing the Transformer to be created.
+ * @returns {Transformer.model} 200 - The updated Transformer object.
+ * @returns {Error}  default - Unexpected error
+ * @headers {string} 200.Authorization - Authorization header with the value "Bearer <token>", where <token> is the retrieved token from the /allspark API. 
+ * @security JWT
+ */
 router.put('/transformers', (request, response) => {
     validateAndCreateTransformer(request, response, transformer => {
         if (request.body.id) {
@@ -91,6 +170,17 @@ router.put('/transformers', (request, response) => {
         }
     });
 });
+/**
+ * Deletes a Transformer based on the transformer ID passed in.
+ * @route DELETE /transformers/{transformerId}
+ * @group transformers - Operations on Transformers
+ * @produces application/json
+ * @param {string} transformerId.path.required - ID of the Transformer to delete.
+ * @returns {string} 204 - An object containing a list of Transformers.
+ * @returns {Error}  401 - Transformer not found.
+ * @headers {string} 200.Authorization - Authorization header with the value "Bearer <token>", where <token> is the retrieved token from the /allspark API. 
+ * @security JWT
+ */
 router.delete('/transformers/:transformerId', (request, response) => {
     return transformersRef = request.database.ref("transformers")
         .child(request.transformersId)

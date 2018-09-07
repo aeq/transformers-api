@@ -182,17 +182,24 @@ router.put('/transformers', (request, response) => {
  * @security JWT
  */
 router.delete('/transformers/:transformerId', (request, response) => {
-    return transformersRef = request.database.ref("transformers")
+    var transformerRef = request.database.ref("transformers")
         .child(request.transformersId)
-        .child(request.params.transformerId)
-        .set(null)
+        .child(request.params.transformerId);
+    transformerRef.once("value")
+        .then(data => {
+            if (data.val()) {
+                return transformerRef.set(null);
+            } else {
+                throw new Error("Transformer does not exist.");
+            }
+        })
         .then(() => {
             response.status(204);
             response.send();
             return;
         })
         .catch(err => {
-            response.status(400);
+            response.status(401);
             response.send(err.message);
         });
 });

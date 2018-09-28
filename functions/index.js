@@ -66,10 +66,15 @@ function verifyHeaders(request, response, next) {
         let headerArgs = request.headers.authorization.split(' ');
         if (headerArgs.length === 2) {
             if (headerArgs[0] === 'Bearer') {
-                let decoded = jwt.verify(headerArgs[1], secret);
-                request.transformersId = decoded.transformersId;
-                request.database = admin.database();
-                next();
+                try {
+                    let decoded = jwt.verify(headerArgs[1], secret);
+                    request.transformersId = decoded.transformersId;
+                    request.database = admin.database();
+                    next();
+                } catch (e) {
+                    response.status(401);
+                    response.send("Invalid authorization token.")
+                }
                 return;
             } else {
                 response.status(401);

@@ -71,11 +71,11 @@ function verifyHeaders(request, response, next) {
                     request.transformersId = decoded.transformersId;
                     request.database = admin.database();
                     next();
+                    return;
                 } catch (e) {
                     response.status(401);
                     response.send("Invalid authorization token.")
                 }
-                return;
             } else {
                 response.status(401);
                 response.send("Wrong authorization header format.");

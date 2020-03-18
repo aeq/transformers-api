@@ -3,7 +3,7 @@ const admin = require('firebase-admin');
 const credentials = require('./service-account-credentials.json');
 admin.initializeApp({
     credential: admin.credential.cert(credentials),
-    databaseURL: 'https://transformers-api.firebaseio.com'
+    databaseURL: 'https://transformers-api.firebaseio.com/'
 });
 
 const bodyParser = require('body-parser');
@@ -61,6 +61,10 @@ app.get('/allspark', (request, response) => {
     response.send(token);
 });
 
+app.get('/version', (request, response) => {
+    response.send("1.0.1")
+});
+
 function verifyHeaders(request, response, next) {
     if (request.headers.authorization) {
         let headerArgs = request.headers.authorization.split(' ');
@@ -73,7 +77,7 @@ function verifyHeaders(request, response, next) {
                     next();
                     return;
                 } catch (e) {
-                    response.status(401);
+                    response.status(403);
                     response.send("Invalid authorization token.")
                 }
             } else {

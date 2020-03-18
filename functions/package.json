@@ -13,9 +13,11 @@
     "body-parser": "^1.18.3",
     "express": "^4.16.3",
     "express-swagger-generator": "^1.1.9",
-    "firebase-admin": "^7.0.0",
-    "firebase-functions": "^2.0.3",
-    "jsonwebtoken": "^8.3.0"
+    "firebase-admin": "^8.10.0",
+    "firebase-functions": "^3.3.0",
+    "jsonwebtoken": "^8.3.0",
+    "minimist": "^1.2.3",
+    "mkdirp": "^1.0.3"
   },
   "devDependencies": {
     "eslint": "^5.13.0",

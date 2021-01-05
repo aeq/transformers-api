@@ -18,7 +18,8 @@
     "jsonwebtoken": "^8.3.0",
     "minimist": "^1.2.3",
     "mkdirp": "^1.0.3",
-    "date-and-time": ">=0.14.2"
+    "date-and-time": ">=0.14.2",
+    "node-forge": ">=0.10.0"
   },
   "devDependencies": {
     "eslint": "^5.13.0",

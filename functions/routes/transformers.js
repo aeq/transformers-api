@@ -3,7 +3,7 @@ const router = express.Router();
 
 /**
  * @typedef Transformer
- * @property {integer} id - Uniquely generated ID.
+ * @property {string} id - Uniquely generated ID.
  * @property {string} name - Transformer name.
  * @property {string} team - Transformer team, either "A" or "D" (Autobot or Decepticon).
  * @property {integer} strength - Strength value, must be between 1 and 10.
@@ -24,7 +24,7 @@ const router = express.Router();
 
 /**
  * @typedef TransformerRequest
- * @property {integer} id - Only needed for PUT requests and must be valid. Will be ignored for POST requests.
+ * @property {string} id - Only needed for PUT requests and must be valid. Will be ignored for POST requests.
  * @property {string} name.required - Transformer name.
  * @property {string} team.required - Transformer team, either "A" or "D" (Autobot or Decepticon).
  * @property {integer} strength.required - Strength value, must be between 1 and 10.
